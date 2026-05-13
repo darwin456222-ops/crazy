@@ -3,60 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Angry Pets: Hotel & Park Full Team</title>
+    <title>Angry Pets: Pure Edition</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a20; overflow: hidden; font-family: 'Arial Black', sans-serif; color: white; touch-action: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #0a0a20; overflow: hidden; font-family: sans-serif; color: white; touch-action: none; }
         
-        #ui { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-around; z-index: 2000; border-bottom: 3px solid #ffd700; }
+        #ui { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 3px solid #00ffcc; }
         
-        .screen { position: absolute; top: 60px; bottom: 95px; width: 100%; overflow-y: auto; display: none; padding: 10px; align-items: center; flex-direction: column; }
-        .active-screen { display: flex; }
+        .main-container { padding: 70px 10px 110px; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow-y: auto; }
 
-        .nav-btn { background: #ff9800; color: white; border: 3px solid #fff; padding: 12px; border-radius: 12px; font-weight: bold; margin: 10px 0; width: 80%; font-size: 16px; cursor: pointer; box-shadow: 0 4px 0 #e68900; }
+        .btn-group { display: flex; gap: 8px; width: 95%; margin-bottom: 15px; }
+        #open-shop-btn { flex: 3; background: #9c27b0; color: white; border: 2px solid #fff; padding: 12px; border-radius: 12px; font-weight: bold; }
+        #reset-btn { flex: 1; background: #444; color: #ccc; border: 1px solid #666; border-radius: 12px; font-size: 10px; font-weight: bold; }
+
+        #hotel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 95vw; padding-bottom: 30px; }
+        .room { position: relative; background: #1a1a30; border: 3px solid #333; border-radius: 15px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
+        .room.locked { background: #050510; border-style: dashed; opacity: 0.5; }
+        .room.active { border-color: #00ffcc; }
+        .room.danger { animation: shake 0.1s infinite; border-color: #ff0055; }
+
+        /* Resimlerin APK içinde düzgün durması için */
+        .pet-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; pointer-events: none; }
         
-        #hotel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 95vw; }
-        .room { position: relative; background: #1a1a30; border: 3px solid #333; border-radius: 15px; height: 125px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .room.active { border-color: #ffd700; box-shadow: 0 0 15px #ffd700; }
-        .room.danger { animation: shake 0.2s infinite; border-color: #ff0055; }
-
-        #park-area { width: 95vw; background: #143d14; border: 4px solid #2e7d32; border-radius: 20px; padding: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 120px; }
-        .park-slot { background: rgba(0,0,0,0.4); border: 2px dashed #4caf50; border-radius: 10px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-
-        #shop-container { width: 95vw; background: #222; border: 3px solid #ff9800; border-radius: 15px; padding: 10px; margin-top: 15px; }
-        .shop-item { background: #333; margin-bottom: 5px; padding: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .buy-btn { background: #2e7d32; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
-        .buy-btn:disabled { background: #555; }
-
-        .pet-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
-        .bubble { position: absolute; top: -8px; right: -8px; width: 45px; height: 45px; background: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 28px; color: black !important; border: 3px solid #00d2ff; z-index: 100; animation: bounce 1s infinite; font-weight: bold; }
+        .bubble { position: absolute; top: -12px; right: -12px; width: 45px; height: 45px; background: white; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 28px; border: 4px solid #00d2ff; z-index: 100; animation: bounce 0.5s infinite; }
         
-        #inventory { position: fixed; bottom: 0; width: 100%; height: 95px; background: #111; display: flex; align-items: center; justify-content: center; gap: 6px; border-top: 3px solid #333; z-index: 2000; }
-        .tool { width: 52px; height: 52px; background: #222; border: 3px solid #444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .tool.selected { border-color: #ffd700; background: #443300; transform: scale(1.1); }
+        #shop-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
 
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        #inventory { position: fixed; bottom: 0; width: 100%; height: 85px; background: #111; display: flex; align-items: center; justify-content: center; gap: 10px; border-top: 3px solid #333; z-index: 1000; }
+        .tool { width: 55px; height: 55px; background: #222; border: 3px solid #444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .tool.selected { border-color: #00ffcc; background: #003322; transform: scale(1.1); }
+
+        @keyframes shake { 0% { transform: translate(2px, 1px); } 50% { transform: translate(-2px, -1px); } 100% { transform: translate(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     </style>
 </head>
 <body>
 
 <div id="ui">
-    <div>💰 <span id="money">500</span></div>
-    <div>GÜN: <span id="day-val">1</span></div>
+    <div>💰 <span id="money">0</span></div>
+    <div>🏨 <span id="pet-count">0</span>/12</div>
 </div>
 
-<div id="hotel-screen" class="screen active-screen">
-    <button class="nav-btn" onclick="switchScreen('park-screen')">🌳 OYUN PARKI & DÜKKAN ➔</button>
+<div class="main-container">
+    <div class="btn-group">
+        <button id="open-shop-btn" onclick="toggleShop(true)">🛒 ODA SATIN AL (100 TL)</button>
+        <button id="reset-btn" onclick="resetGame()">SIFIRLA</button>
+    </div>
     <div id="hotel"></div>
 </div>
 
-<div id="park-screen" class="screen">
-    <button class="nav-btn" style="background:#2196F3;" onclick="switchScreen('hotel-screen')">🏨 OTELE GERİ DÖN ➔</button>
-    <div id="park-area"></div>
-    <div id="shop-container">
-        <h3 style="text-align:center; color:#ff9800; margin-bottom:10px; font-size:14px;">OYUNCAK DÜKKANI</h3>
-        <div id="shop-items"></div>
+<div id="shop-overlay">
+    <div style="background:#222; padding:30px; border-radius:20px; width:85%; text-align:center; border: 2px solid #9c27b0;">
+        <h2 style="color:#ff9800; margin-bottom:20px;">DÜKKAN</h2>
+        <button onclick="buyRoom()" style="background:#2e7d32; color:white; width:100%; padding:15px; border:none; border-radius:10px; font-weight:bold;">YENİ ODA AÇ (100 TL)</button>
+        <button onclick="toggleShop(false)" style="margin-top:20px; background:#444; color:white; width:100%; padding:10px; border:none; border-radius:10px;">GERİ DÖ</button>
     </div>
 </div>
 
@@ -65,156 +65,140 @@
     <div class="tool" onclick="selectTool('🍔', this)">🍔</div>
     <div class="tool" onclick="selectTool('🎾', this)">🎾</div>
     <div class="tool" onclick="selectTool('💦', this)">💦</div>
-    <div class="tool" onclick="selectTool('🎡', this)">🎡</div>
 </div>
 
 <script>
     const rawUrl = "https://raw.githubusercontent.com/darwin456222-ops/Darwiizl/main/";
     const allNeeds = ["⏰", "🍔", "🎾", "💦"];
-    let money = 500;
-    let day = 1;
+    let money = 0;
     let selectedTool = "⏰";
-    let purchasedToys = 0;
+    let usedPets = [];
+    let rooms = [];
 
-    const toys = [
-        { name: "Salıncak", price: 400, icon: "⛓️" },
-        { name: "Kaydırak", price: 800, icon: "🎢" },
-        { name: "Zıpzıp", price: 1500, icon: "🍄" },
-        { name: "Tahterevalli", price: 2500, icon: "⚖️" },
-        { name: "Kum Havuzu", price: 4000, icon: "🏖️" },
-        { name: "Dönme Dolap", price: 6000, icon: "🎡" }
-    ];
-
-    // TÜM 13 PET BURADA
+    // Mimi ve Coco Çıkarıldı -> Browny ve Stary Eklendi
     const petTypes = [
         { name: "Squeak", img: "squeak.jpg" }, { name: "Gus", img: "gus.jpg" },
         { name: "Blinky", img: "blinky.jpg" }, { name: "Flip", img: "flip.jpg" },
-        { name: "Dot", img: "dot.jpg" }, { name: "Sugar", img: "sugar.jpg" },
+        { name: "Sugar", img: "sugar.jpg" }, { name: "Dot", img: "dot.jpg" },
         { name: "Sunny", img: "sunny.jpg" }, { name: "Sleapy", img: "sleapy.jpg" },
-        { name: "Pinky", img: "pinky.jpg" }, { name: "Browny", img: "browny.jpg" },
-        { name: "Stary", img: "stary.jpg" }, { name: "Dinory", img: "dinory.jpg" },
-        { name: "Yeyet", img: "yeyet.jpg", vip: true }
+        { name: "Pinky", img: "pinky.jpg" }, { name: "Dinory", img: "dinory.jpg" },
+        { name: "Browny", img: "browny.jpg" }, { name: "Stary", img: "stary.jpg" }
     ];
 
-    let rooms = Array(6).fill(null).map(() => ({ occupied: false, pet: null, daysLeft: 0, needActive: false, currentNeed: "", timer: 100 }));
-
-    function switchScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-        document.getElementById(id).classList.add('active-screen');
+    function saveGame() {
+        const data = { money, usedPets, rooms: rooms.map(r => ({ locked: r.locked, occupied: r.occupied, pet: r.pet })) };
+        localStorage.setItem('angryPets_v2', JSON.stringify(data));
     }
 
-    function init() {
-        const hotelDiv = document.getElementById('hotel');
-        const shopDiv = document.getElementById('shop-items');
-        const parkDiv = document.getElementById('park-area');
-
-        hotelDiv.innerHTML = '';
-        rooms.forEach((_, i) => hotelDiv.innerHTML += `<div class="room" id="room-${i}" onclick="useTool(${i})"></div>`);
-
-        parkDiv.innerHTML = '';
-        for(let i=0; i<6; i++) parkDiv.innerHTML += `<div class="park-slot" id="park-${i}">?</div>`;
-
-        shopDiv.innerHTML = '';
-        toys.forEach((toy, i) => {
-            shopDiv.innerHTML += `<div class="shop-item">
-                <span>${toy.icon} ${toy.name} (${toy.price})</span>
-                <button class="buy-btn" id="buy-${i}" onclick="buyToy(${i})">AL</button>
-            </div>`;
-        });
-        updateUI();
-        checkIn();
-    }
-
-    function buyToy(idx) {
-        if (money >= toys[idx].price && purchasedToys === idx) {
-            money -= toys[idx].price;
-            document.getElementById(`park-${idx}`).innerText = toys[idx].icon;
-            document.getElementById(`buy-${idx}`).innerText = "ALINDI";
-            document.getElementById(`buy-${idx}`).disabled = true;
-            purchasedToys++;
-            updateUI();
-        } else if (purchasedToys !== idx) alert("Sırayla almalısın!");
-        else alert("Yetersiz para!");
-    }
-
-    function renderRoom(idx) {
-        const room = rooms[idx];
-        const el = document.getElementById(`room-${idx}`);
-        if (!room.occupied) { el.innerHTML = `<span style="color:#444; font-size:10px;">BOŞ ODA</span>`; return; }
-        el.className = `room ${room.needActive ? (room.timer < 35 ? 'danger' : 'active') : ''}`;
-        el.innerHTML = `
-            <div class="bubble" style="display: ${room.needActive ? 'flex' : 'none'}">${room.currentNeed}</div>
-            <img class="pet-img" src="${rawUrl + room.pet.img}" onerror="this.src='https://via.placeholder.com/60?text=PET'">
-            <div style="font-size:10px; margin-top:4px; font-weight:bold;">${room.pet.name} ${room.pet.vip ? '⭐' : ''}</div>
-            <div style="font-size:9px; color:#00d2ff;">GÜN: ${room.daysLeft}</div>
-        `;
-    }
-
-    function useTool(idx) {
-        const room = rooms[idx];
-        if (room.occupied && room.needActive && selectedTool === room.currentNeed) {
-            room.needActive = false;
-            money += (room.pet.vip ? 200 : 50);
-            updateUI();
-            renderRoom(idx);
+    function loadGame() {
+        const saved = localStorage.getItem('angryPets_v2');
+        if (saved) {
+            const data = JSON.parse(saved);
+            money = data.money;
+            usedPets = data.usedPets;
+            rooms = data.rooms.map(r => ({ ...r, needActive: false, currentNeed: "", timer: 100 }));
+        } else {
+            rooms = Array(12).fill(null).map((_, i) => ({
+                locked: i >= 6, occupied: false, pet: null, needActive: false, currentNeed: "", timer: 100
+            }));
         }
     }
 
-    function nextDay() {
-        day++;
+    function resetGame() {
+        if(confirm("Tüm ilerleme silinsin mi?")) {
+            localStorage.removeItem('angryPets_v2');
+            location.reload();
+        }
+    }
+
+    function toggleShop(s) { document.getElementById('shop-overlay').style.display = s ? 'flex' : 'none'; }
+
+    function buyRoom() {
+        const idx = rooms.findIndex(r => r.locked);
+        if (idx !== -1 && money >= 100) {
+            money -= 100;
+            rooms[idx].locked = false;
+            saveGame(); updateUI(); updateHotel(); toggleShop(false);
+        } else { alert("Para yetersiz veya tüm odalar açık!"); }
+    }
+
+    function updateHotel() {
+        const hotel = document.getElementById('hotel');
+        hotel.innerHTML = '';
         rooms.forEach((room, i) => {
-            if (room.occupied) {
-                room.daysLeft--;
-                if (room.daysLeft <= 0) {
-                    money += (room.pet.vip ? 1200 : 400);
-                    room.occupied = false;
-                }
+            const div = document.createElement('div');
+            div.onclick = () => useTool(i);
+            if (room.locked) {
+                div.className = 'room locked';
+                div.innerHTML = `<span>🔒</span>`;
+            } else if (!room.occupied) {
+                div.className = 'room';
+                div.innerHTML = `<span style="font-size:10px; color:#555;">BOŞ</span>`;
+            } else {
+                div.className = `room occupied ${room.needActive ? (room.timer < 35 ? 'danger' : 'active') : ''}`;
+                div.innerHTML = `
+                    <div class="bubble" style="display:${room.needActive?'flex':'none'}">${room.currentNeed}</div>
+                    <img class="pet-img" src="${rawUrl + room.pet.img}" onerror="this.style.display='none'">
+                    <div style="font-size:10px; margin-top:5px;">${room.pet.name}</div>
+                `;
             }
-            renderRoom(i);
+            hotel.appendChild(div);
         });
-        if (Math.random() > 0.3) checkIn();
-        updateUI();
     }
 
     function checkIn() {
-        const emptyIdx = rooms.findIndex(r => !r.occupied);
-        if (emptyIdx === -1) return;
-        const pet = petTypes[Math.floor(Math.random() * petTypes.length)];
-        rooms[emptyIdx] = { occupied: true, pet: pet, daysLeft: Math.floor(Math.random()*3)+2, needActive: false, currentNeed: "", timer: 100 };
-        renderRoom(emptyIdx);
+        const empty = rooms.findIndex(r => !r.locked && !r.occupied);
+        if (empty !== -1 && usedPets.length < 12) {
+            const avail = petTypes.filter(p => !usedPets.includes(p.name));
+            if (avail.length > 0) {
+                const p = avail[Math.floor(Math.random() * avail.length)];
+                rooms[empty].occupied = true; rooms[empty].pet = p;
+                usedPets.push(p.name);
+                saveGame(); updateUI(); updateHotel();
+            }
+        }
     }
 
-    function selectTool(tool, el) {
-        selectedTool = tool;
-        document.querySelectorAll('.tool').forEach(t => t.classList.remove('selected'));
+    function useTool(i) {
+        const r = rooms[i];
+        if (r && r.occupied && r.needActive && selectedTool === r.currentNeed) {
+            r.needActive = false; money += 2;
+            saveGame(); updateUI(); updateHotel();
+        }
+    }
+
+    function selectTool(t, el) {
+        selectedTool = t;
+        document.querySelectorAll('.tool').forEach(x => x.classList.remove('selected'));
         el.classList.add('selected');
     }
 
     function updateUI() {
         document.getElementById('money').innerText = money;
-        document.getElementById('day-val').innerText = day;
+        document.getElementById('pet-count').innerText = usedPets.length;
     }
 
     setInterval(() => {
-        rooms.forEach((room, i) => {
-            if (room.occupied) {
-                let chance = room.pet.vip ? 0.96 : 0.985;
-                if (!room.needActive && Math.random() > chance) {
-                    room.needActive = true;
-                    if (purchasedToys > 0 && Math.random() > 0.6) room.currentNeed = "🎡";
-                    else room.currentNeed = allNeeds[Math.floor(Math.random() * allNeeds.length)];
+        rooms.forEach(r => {
+            if (r.occupied) {
+                if (!r.needActive && Math.random() > 0.98) {
+                    r.needActive = true;
+                    r.currentNeed = allNeeds[Math.floor(Math.random() * allNeeds.length)];
+                    r.timer = 100;
                 }
-                if (room.needActive) {
-                    room.timer -= (room.pet.vip ? 2.3 : 1.3);
-                    if (room.timer <= 0) { alert("OYUN BİTTİ!"); location.reload(); }
+                if (r.needActive) {
+                    r.timer -= 1.0;
+                    if (r.timer <= 0) { r.needActive = false; r.timer = 100; }
                 }
-                renderRoom(i);
             }
         });
-    }, 250);
+        updateHotel();
+    }, 400);
 
-    setInterval(nextDay, 8000);
-    init();
+    window.onload = () => {
+        loadGame(); updateUI(); updateHotel();
+        setInterval(checkIn, 6000);
+    };
 </script>
 </body>
 </html>
